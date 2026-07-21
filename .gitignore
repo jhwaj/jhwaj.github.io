@@ -1,0 +1,12 @@
+# 비밀 정보 — 절대 업로드 금지
+.env
+.env.*
+*.pem
+*.key
+*credentials*
+*secret*
+config.local.*
+
+# 시스템/도구 파일
+.DS_Store
+node_modules/
