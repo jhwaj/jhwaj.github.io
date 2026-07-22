@@ -35,17 +35,24 @@
   let myName = null;
   let myPublicId = localStorage.getItem('frog.publicId') || null;
 
-  // 서버(node server.js) 유무 자동 감지 — 없으면(예: GitHub Pages) 로컬 기록 모드
+  // 서버 주소: window.FROG_SERVER (index.html에서 설정) 또는 URL 파라미터 ?server=https://xxx
+  const urlParams = new URLSearchParams(window.location.search);
+  const SERVER_URL = urlParams.get('server') || window.FROG_SERVER || '';
+
   let hasServer = false;
   async function detectServer() {
+    if (!SERVER_URL) { hasServer = false; return; }
     try {
-      const r = await fetch('api/leaderboard', { cache: 'no-store' });
+      const base = SERVER_URL.replace(/\/$/, '');
+      const r = await fetch(`${base}/api/leaderboard`, { cache: 'no-store' });
       hasServer = r.ok && Array.isArray(await r.json());
     } catch { hasServer = false; }
   }
 
   async function api(path, body) {
-    const res = await fetch(path, {
+    const base = SERVER_URL ? SERVER_URL.replace(/\/$/, '') : '';
+    const fullPath = path.startsWith('/') ? `${base}${path}` : `${base}/${path}`;
+    const res = await fetch(fullPath, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -80,7 +87,8 @@
   }
 
   function connectSSE() {
-    const es = new EventSource('api/events');
+    const base = SERVER_URL ? SERVER_URL.replace(/\/$/, '') : '';
+    const es = new EventSource(`${base}/api/events`);
     es.addEventListener('leaderboard', (e) => {
       try { renderLeaderboard(JSON.parse(e.data)); } catch {}
     });
