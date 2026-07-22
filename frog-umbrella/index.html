@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css?v=2" />
+<link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -71,10 +71,19 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-  // 랭킹 서버 주소 — cloudflared 터널 재시작 시 이 URL만 바꾸면 됨
-  window.FROG_SERVER = 'https://peninsula-salon-experiment-surgery.trycloudflare.com';
+  firebase.initializeApp({
+    apiKey: "AIzaSyAvAnBWoW_gPscztT2flPOl9i3QR724DOQ",
+    authDomain: "frog-umbrella.firebaseapp.com",
+    databaseURL: "https://frog-umbrella-default-rtdb.firebaseio.com",
+    projectId: "frog-umbrella",
+    storageBucket: "frog-umbrella.firebasestorage.app",
+    messagingSenderId: "55113980775",
+    appId: "1:55113980775:web:8940df4807e7221c5bedc2"
+  });
 </script>
-<script src="game.js?v=3"></script>
+<script src="game.js?v=4"></script>
 </body>
 </html>
