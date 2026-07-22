@@ -1,0 +1,285 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper: #fdf8ec;
+  --ink: #2b2b33;
+  --accent: #ff5a4e;
+  --shadow: rgba(20, 20, 40, 0.35);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a2030;
+  font-family: 'Jua', 'Black Han Sans', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- 종이 카드 공통 ---------- */
+.paper-card {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 10px;
+  box-shadow: 4px 5px 0 var(--shadow);
+  border: 2px solid rgba(43, 43, 51, 0.75);
+}
+
+.paper-btn {
+  font-family: 'Black Han Sans', 'Jua', sans-serif;
+  font-size: 1.3rem;
+  padding: 12px 28px;
+  background: var(--accent);
+  color: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 4px 5px 0 var(--shadow);
+  cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.paper-btn:hover { transform: translate(-1px, -2px) rotate(-1deg); box-shadow: 6px 7px 0 var(--shadow); }
+.paper-btn:active { transform: translate(2px, 3px); box-shadow: 1px 1px 0 var(--shadow); }
+
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+#score-box {
+  padding: 8px 18px;
+  transform: rotate(-2deg);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+#score-box .label {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 1rem;
+  color: #8a8578;
+}
+#score {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 2.6rem;
+  color: var(--ink);
+  line-height: 1;
+}
+
+#lives-box {
+  padding: 6px 14px;
+  font-size: 1.5rem;
+  transform: rotate(-1deg);
+  letter-spacing: 4px;
+  width: fit-content;
+}
+
+#speed-box {
+  padding: 5px 14px;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 1rem;
+  transform: rotate(-1.5deg);
+  width: fit-content;
+  color: #d8481f;
+}
+
+/* ---------- 리더보드 ---------- */
+#leaderboard {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: 240px;
+  max-height: 62vh;
+  padding: 12px 14px;
+  z-index: 20;
+  transform: rotate(1.2deg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#leaderboard h3 {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+  border-bottom: 2px dashed #c9c2ae;
+  padding-bottom: 6px;
+}
+#lb-list {
+  list-style: none;
+  overflow-y: auto;
+  font-size: 0.95rem;
+}
+#lb-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+#lb-list li .rank { width: 2.1em; flex: none; font-family: 'Black Han Sans', sans-serif; }
+#lb-list li .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+#lb-list li .sc { font-family: 'Black Han Sans', sans-serif; }
+#lb-list li.me { background: #ffe9a8; outline: 2px dashed #e0a437; }
+#lb-list li.rank-1 .rank { color: #d4a017; }
+#lb-list li.rank-2 .rank { color: #8f9aa8; }
+#lb-list li.rank-3 .rank { color: #b0682a; }
+#lb-list li.updated { animation: lb-flash 0.9s ease-out; }
+@keyframes lb-flash {
+  0% { background: #b8f3c9; transform: scale(1.06); }
+  100% { background: transparent; transform: scale(1); }
+}
+
+/* ---------- 판정 팝업 ---------- */
+#popup-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+.popup {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  font-family: 'Black Han Sans', sans-serif;
+  white-space: nowrap;
+  -webkit-text-stroke: 2.5px #fff;
+  paint-order: stroke fill;
+  text-shadow: 5px 6px 0 rgba(20, 20, 40, 0.45);
+}
+.popup.block {
+  color: #23b34f;
+  font-size: clamp(3rem, 9vw, 7rem);
+  animation: pop-block 0.85s cubic-bezier(0.2, 1.6, 0.4, 1) forwards;
+}
+.popup.ouch {
+  color: #ff3b2f;
+  font-size: clamp(3.4rem, 10vw, 8rem);
+  animation: pop-ouch 0.8s ease-out forwards;
+}
+@keyframes pop-block {
+  0%   { transform: translate(-50%, -50%) scale(0.1) rotate(-14deg); opacity: 0; }
+  18%  { transform: translate(-50%, -50%) scale(1.35) rotate(5deg); opacity: 1; }
+  30%  { transform: translate(-50%, -50%) scale(0.95) rotate(-3deg); }
+  42%  { transform: translate(-50%, -50%) scale(1.08) rotate(2deg); }
+  75%  { transform: translate(-50%, -55%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -85%) scale(1) rotate(0deg); opacity: 0; }
+}
+@keyframes pop-ouch {
+  0%   { transform: translate(-50%, -50%) scale(2.6) rotate(8deg); opacity: 0; }
+  15%  { transform: translate(-50%, -50%) scale(1) rotate(-6deg); opacity: 1; }
+  25%  { transform: translate(-47%, -52%) scale(1.05) rotate(5deg); }
+  35%  { transform: translate(-53%, -48%) scale(1) rotate(-5deg); }
+  45%  { transform: translate(-48%, -51%) scale(1.03) rotate(3deg); }
+  80%  { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -44%) scale(0.9) rotate(0deg); opacity: 0; }
+}
+
+/* ---------- FAIL 스탬프 ---------- */
+#fail-stamp {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  z-index: 40;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(6rem, 18vw, 14rem);
+  color: #e02020;
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  text-shadow: 8px 10px 0 rgba(20, 20, 40, 0.5);
+  transform: translate(-50%, -50%) rotate(-8deg);
+  animation: stamp 0.5s cubic-bezier(0.3, 1.8, 0.5, 1) forwards;
+  pointer-events: none;
+}
+@keyframes stamp {
+  0%   { transform: translate(-50%, -50%) scale(4) rotate(-8deg); opacity: 0; }
+  60%  { transform: translate(-50%, -50%) scale(0.92) rotate(-8deg); opacity: 1; }
+  80%  { transform: translate(-50%, -50%) scale(1.06) rotate(-8deg); }
+  100% { transform: translate(-50%, -50%) scale(1) rotate(-8deg); opacity: 1; }
+}
+
+/* ---------- 모달 ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 18, 32, 0.55);
+  backdrop-filter: blur(3px);
+}
+.modal-box {
+  padding: 34px 44px;
+  text-align: center;
+  max-width: min(520px, 92vw);
+  transform: rotate(-0.8deg);
+}
+.modal-box h1 {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 2.1rem;
+  margin-bottom: 14px;
+}
+.modal-box p { margin-bottom: 14px; font-size: 1.05rem; line-height: 1.5; }
+.modal-box small { color: #8a8578; }
+.howto {
+  background: #fff;
+  border: 2px dashed #c9c2ae;
+  border-radius: 10px;
+  padding: 14px 10px;
+  margin-bottom: 20px;
+}
+.howto p { margin-bottom: 6px; }
+.howto p:last-child { margin-bottom: 0; }
+
+#name-input {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.3rem;
+  text-align: center;
+  padding: 10px 14px;
+  width: 100%;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #fff;
+  outline: none;
+}
+#name-input:focus { border-color: var(--accent); }
+#name-error {
+  color: #e02020;
+  font-size: 0.95rem;
+  min-height: 1.4em;
+  margin-bottom: 8px;
+}
+
+.over-title { color: #e02020; }
+.final-score-label {
+  font-family: 'Black Han Sans', sans-serif;
+  color: #8a8578;
+  margin-bottom: 0 !important;
+}
+#final-score {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 4.5rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+#best-msg { color: #23b34f; font-weight: bold; min-height: 1.4em; }

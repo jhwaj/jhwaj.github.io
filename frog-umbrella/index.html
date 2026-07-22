@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>🐸 개구리 우산 대작전</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="paper-card" id="score-box">
+    <span class="label">SCORE</span>
+    <span id="score">0</span>
+  </div>
+  <div class="paper-card" id="lives-box"></div>
+  <div class="paper-card" id="speed-box">SPEED ×<span id="speed">1.0</span></div>
+</div>
+
+<!-- 실시간 리더보드 -->
+<div id="leaderboard" class="paper-card">
+  <h3>🏆 실시간 랭킹</h3>
+  <ol id="lb-list"></ol>
+</div>
+
+<!-- 판정 팝업 영역 -->
+<div id="popup-layer"></div>
+
+<!-- FAIL 스탬프 -->
+<div id="fail-stamp" class="hidden">FAIL</div>
+
+<!-- 닉네임 등록 모달 -->
+<div id="modal-name" class="modal hidden">
+  <div class="paper-card modal-box">
+    <h1>🐸 개구리 우산 대작전</h1>
+    <p>처음 왔구나! 닉네임을 만들어줘<br /><small>(한 번 정하면 바꿀 수 없어요)</small></p>
+    <input id="name-input" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" />
+    <div id="name-error"></div>
+    <button id="name-btn" class="paper-btn">이 이름으로 시작!</button>
+  </div>
+</div>
+
+<!-- 시작 모달 -->
+<div id="modal-start" class="modal hidden">
+  <div class="paper-card modal-box">
+    <h1>🐸 개구리 우산 대작전</h1>
+    <p id="welcome-msg"></p>
+    <div class="howto">
+      <p>🚌 버스가 물웅덩이를 지나갈 때</p>
+      <p>⌨️ <b>스페이스바</b>로 우산을 펼쳐 물을 막아라!</p>
+      <p>💦 못 막으면 라이프 -1 (❤️×3)</p>
+      <p>⚡ 버스는 점점 빨라진다…</p>
+    </div>
+    <button id="start-btn" class="paper-btn">게임 시작! (Space)</button>
+  </div>
+</div>
+
+<!-- 게임오버 모달 -->
+<div id="modal-over" class="modal hidden">
+  <div class="paper-card modal-box">
+    <h1 class="over-title">게임 종료!</h1>
+    <p class="final-score-label">SCORE</p>
+    <p id="final-score">0</p>
+    <p id="best-msg"></p>
+    <button id="retry-btn" class="paper-btn">다시하기 (Space)</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
