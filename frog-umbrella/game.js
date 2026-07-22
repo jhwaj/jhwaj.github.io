@@ -41,7 +41,14 @@
 
   let hasServer = false;
   async function detectServer() {
-    if (!SERVER_URL) { hasServer = false; return; }
+    if (!SERVER_URL) {
+      // SERVER_URL 없으면 같은 도메인에서 시도 (로컬 서버 직접 접속)
+      try {
+        const r = await fetch('/api/leaderboard', { cache: 'no-store' });
+        hasServer = r.ok && Array.isArray(await r.json());
+      } catch { hasServer = false; }
+      return;
+    }
     try {
       const base = SERVER_URL.replace(/\/$/, '');
       const r = await fetch(`${base}/api/leaderboard`, { cache: 'no-store' });
@@ -88,14 +95,15 @@
 
   function connectSSE() {
     const base = SERVER_URL ? SERVER_URL.replace(/\/$/, '') : '';
-    const es = new EventSource(`${base}/api/events`);
-    es.addEventListener('leaderboard', (e) => {
-      try { renderLeaderboard(JSON.parse(e.data)); } catch {}
-    });
-    es.onerror = () => {
-      es.close();
-      setTimeout(connectSSE, 2000);
-    };
+    // Cloudflare Tunnel 환경에서 SSE 버퍼링 문제 우회: 폴링 방식 사용
+    async function poll() {
+      try {
+        const r = await fetch(`${base}/api/leaderboard`, { cache: 'no-store' });
+        if (r.ok) renderLeaderboard(await r.json());
+      } catch {}
+    }
+    poll();
+    setInterval(poll, 3000);
   }
 
   // ---------- 사운드 (WebAudio 합성) ----------
