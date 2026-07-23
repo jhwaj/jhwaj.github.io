@@ -62,16 +62,6 @@ function lastChange(values) {
     return 0;
 }
 
-function last7Dates() {
-    const arr = [];
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        arr.push(d);
-    }
-    return arr;
-}
-
 function fmtYm(t) { return `${t.slice(0, 4)}.${t.slice(4, 6)}`; }
 
 async function buildRates() {
@@ -92,16 +82,17 @@ async function buildRates() {
     if (!mortMonthly.length) throw new Error('주담대 월별 데이터 없음');
     if (!depoMonthly.length) throw new Error('예금 월별 데이터 없음');
 
-    const days = last7Dates();
+    // 기준금리: 월별 시리즈 마지막을 이번 달(최신 일별값)으로 보정 후 최근 7개월
+    const curYm = ym(today);
+    const latestDaily = baseDaily[baseDaily.length - 1].value;
+    const baseSeries = baseMonthly.slice();
+    if (!baseSeries.length || baseSeries[baseSeries.length - 1].time !== curYm) {
+        baseSeries.push({ time: curYm, value: latestDaily });
+    } else {
+        baseSeries[baseSeries.length - 1] = { time: curYm, value: latestDaily };
+    }
 
-    // 기준금리: 각 날짜에 유효한 값 (해당일 이하 가장 최근 값으로 채움)
-    const weeklyBase = days.map(d => {
-        const dy = ymd(d);
-        let cur = null;
-        for (const r of baseDaily) { if (r.time <= dy) cur = r.value; }
-        if (cur === null) cur = baseDaily[0].value;
-        return { date: dy, value: cur };
-    });
+    const toSeries = rows => rows.slice(-7).map(r => ({ ym: r.time, value: r.value }));
 
     const mortCur = mortMonthly[mortMonthly.length - 1];
     const mortPrev = mortMonthly[mortMonthly.length - 2];
@@ -112,22 +103,22 @@ async function buildRates() {
         fetchedAt: new Date().toISOString(),
         apiKeyType: key === 'sample' ? 'sample' : 'user',
         base: {
-            current: weeklyBase[weeklyBase.length - 1].value,
+            current: latestDaily,
             change: lastChange([...baseMonthly.map(r => r.value), ...baseDaily.map(r => r.value)]),
-            weekly: weeklyBase,
+            series: toSeries(baseSeries),
             label: '한국은행 기준금리',
         },
         mort: {
             current: mortCur.value,
             change: +(mortCur.value - (mortPrev ? mortPrev.value : mortCur.value)).toFixed(2),
-            weekly: days.map(d => ({ date: ymd(d), value: mortCur.value })),
+            series: toSeries(mortMonthly),
             asOf: fmtYm(mortCur.time),
             label: '주택담보대출 가중평균금리(신규취급액)',
         },
         depo: {
             current: depoCur.value,
             change: +(depoCur.value - (depoPrev ? depoPrev.value : depoCur.value)).toFixed(2),
-            weekly: days.map(d => ({ date: ymd(d), value: depoCur.value })),
+            series: toSeries(depoMonthly),
             asOf: fmtYm(depoCur.time),
             label: '정기예금 가중평균금리(신규취급액)',
         },

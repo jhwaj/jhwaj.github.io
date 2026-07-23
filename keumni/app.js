@@ -1,24 +1,21 @@
 // 어!금니 - 3D 어금니 렌더링
 
-const DAY_NAMES = ['일','월','화','수','목','금','토'];
-
-// 서버 미실행 시 폴백용 샘플 데이터 (서버 응답과 동일한 형태)
+// 서버 미실행 시 폴백용 샘플 데이터 (서버 응답과 동일한 형태: 최근 7개월 시리즈)
 function sampleData() {
-    const weekly = vals => {
+    const series = vals => {
         const arr = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
-            d.setDate(d.getDate() - i);
-            const dy = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-            arr.push({ date: dy, value: vals[6 - i] });
+            d.setMonth(d.getMonth() - i);
+            arr.push({ ym: `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`, value: vals[6 - i] });
         }
         return arr;
     };
     return {
         sample: true,
-        base: { current: 2.75, change: -0.25, weekly: weekly([3.00, 3.00, 3.00, 2.75, 2.75, 2.75, 2.75]) },
-        mort: { current: 3.82, change: -0.15, weekly: weekly([4.05, 3.98, 3.95, 3.90, 3.88, 3.85, 3.82]) },
-        depo: { current: 3.21, change: +0.05, weekly: weekly([3.10, 3.12, 3.15, 3.16, 3.18, 3.20, 3.21]) },
+        base: { current: 2.75, change: -0.25, series: series([3.00, 3.00, 3.00, 2.75, 2.75, 2.75, 2.75]) },
+        mort: { current: 3.82, change: -0.15, series: series([4.05, 3.98, 3.95, 3.90, 3.88, 3.85, 3.82]) },
+        depo: { current: 3.21, change: +0.05, series: series([3.10, 3.12, 3.15, 3.16, 3.18, 3.20, 3.21]) },
     };
 }
 
@@ -295,31 +292,32 @@ function rateToScale(rate, allRates) {
     return 0.5 + ((rate - min) / (max - min)) * 1.0;
 }
 
-function renderChart(chartId, weekly) {
+function renderChart(chartId, series) {
     const el = document.getElementById(chartId);
     el.innerHTML = '';
-    const values = weekly.map(w => w.value);
+    const values = series.map(s => s.value);
 
-    weekly.forEach((w, i) => {
-        const scale = rateToScale(w.value, values);
-        const d = new Date(+w.date.slice(0, 4), +w.date.slice(4, 6) - 1, +w.date.slice(6, 8));
+    series.forEach((s, i) => {
+        const scale = rateToScale(s.value, values);
+        const month = +s.ym.slice(4, 6);
+        const year = s.ym.slice(0, 4);
 
         const col = document.createElement('div');
-        col.className = 'tooth-col' + (i === weekly.length - 1 ? ' today' : '');
+        col.className = 'tooth-col' + (i === series.length - 1 ? ' today' : '');
 
         // 금리 숫자
         const rateEl = document.createElement('div');
         rateEl.className = 'tooth-rate';
-        rateEl.textContent = w.value.toFixed(2);
+        rateEl.textContent = s.value.toFixed(2);
 
         // 3D 어금니 캔버스
         const canvas = renderMolarToCanvas(scale, 120, 200);
         canvas.className = 'tooth-canvas';
 
-        // 날짜
+        // 월 라벨
         const dateEl = document.createElement('div');
         dateEl.className = 'tooth-date';
-        dateEl.innerHTML = `<div class="tooth-date-num">${d.getDate()}</div><div class="tooth-date-day">${DAY_NAMES[d.getDay()]}</div>`;
+        dateEl.innerHTML = `<div class="tooth-date-num">${month}월</div><div class="tooth-date-day">${year}</div>`;
 
         col.appendChild(rateEl);
         col.appendChild(canvas);
@@ -342,9 +340,9 @@ function renderAll(data) {
     setChg('base-chg', data.base.change);
     setChg('mort-chg', data.mort.change);
     setChg('depo-chg', data.depo.change);
-    renderChart('chart-base', data.base.weekly);
-    renderChart('chart-mort', data.mort.weekly);
-    renderChart('chart-depo', data.depo.weekly);
+    renderChart('chart-base', data.base.series);
+    renderChart('chart-mort', data.mort.series);
+    renderChart('chart-depo', data.depo.series);
 
     const footer = document.getElementById('footer-info');
     if (data.sample) {
