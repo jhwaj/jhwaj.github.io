@@ -6,6 +6,8 @@
 *credentials*
 *secret*
 config.local.*
+config.json
+keumni/data/
 
 # 시스템/도구 파일
 .DS_Store

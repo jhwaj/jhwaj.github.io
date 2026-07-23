@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>어!금니 - 오늘의 금리</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <h1 class="logo">어!금니</h1>
+            <p class="date" id="today-date"></p>
+            <button class="refresh-btn" id="refresh-btn">↻ 갱신</button>
+        </header>
+
+        <section class="charts-row">
+            <div class="chart-col">
+                <div class="chart-head">
+                    <span class="chart-title">기준금리</span>
+                    <span class="chart-value" id="base-val"></span>
+                    <span class="chart-change" id="base-chg"></span>
+                </div>
+                <div class="tooth-chart" id="chart-base"></div>
+            </div>
+            <div class="chart-col">
+                <div class="chart-head">
+                    <span class="chart-title">주담대</span>
+                    <span class="chart-value" id="mort-val"></span>
+                    <span class="chart-change" id="mort-chg"></span>
+                </div>
+                <div class="tooth-chart" id="chart-mort"></div>
+            </div>
+            <div class="chart-col">
+                <div class="chart-head">
+                    <span class="chart-title">예금</span>
+                    <span class="chart-value" id="depo-val"></span>
+                    <span class="chart-change" id="depo-chg"></span>
+                </div>
+                <div class="tooth-chart" id="chart-depo"></div>
+            </div>
+        </section>
+
+        <footer class="footer" id="footer-info">데이터 불러오는 중…</footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
