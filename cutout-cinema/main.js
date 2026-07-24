@@ -310,8 +310,6 @@ async function startScreening() {
   const pack = pickPack();
   const scn = pickScenario(ctx, pack);
   const scenes = composeScenes(scn, ctx, pack);
-  scenes.unshift({ bg: 'day', hold: 2000, fx: [], sub: `오늘의 장르 — ${pack.name}` });
-  $('genreTag').textContent = pack.name;
   const st = currentShow = { aborted: false };
   const snap = snapshotPositions();
   document.body.classList.add('cinema');

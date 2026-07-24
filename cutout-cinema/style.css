@@ -88,11 +88,6 @@ body.cinema #subwrap{display:block}
 }
 body.cinema #exitBtn{display:block}
 #exitBtn:hover{background:rgba(255,255,255,.15)}
-#genreTag{
-  position:fixed;top:24px;left:20px;z-index:16;display:none;
-  color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.2em;font-weight:700;
-}
-body.cinema #genreTag{display:block}
 
 /* ── 엔딩 ── */
 #ending{
