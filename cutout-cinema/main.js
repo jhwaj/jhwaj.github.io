@@ -123,8 +123,20 @@ function buildCtx() {
   };
 }
 
-function pickScenario(ctx) {
-  return SCENARIOS.slice().sort((a, b) => b.priority - a.priority).find(s => s.match(ctx));
+// 상영마다 장르 랜덤 (개발용 ?genre=art|comedy|makjang 로 고정 가능)
+function pickPack() {
+  const want = new URLSearchParams(location.search).get('genre');
+  if (want && GENRE_PACKS[want]) return GENRE_PACKS[want];
+  const ids = Object.keys(GENRE_PACKS);
+  return GENRE_PACKS[ids[Math.floor(Math.random() * ids.length)]];
+}
+
+// 최고 우선순위 매칭이 여럿이면 그중 랜덤 — 같은 조합도 다른 이야기가 나올 수 있게
+function pickScenario(ctx, pack) {
+  const matches = pack.SCENARIOS.filter(s => s.match(ctx));
+  const top = Math.max(...matches.map(s => s.priority));
+  const cands = matches.filter(s => s.priority === top);
+  return cands[Math.floor(Math.random() * cands.length)];
 }
 
 /* ── 상영 엔진 ── */
@@ -257,7 +269,7 @@ async function playScene(scene, ctx, st) {
 
 // 본편 + 관계 비트 합성: 주연(stars)이 아닌 배치 조각은
 // 주연 하나를 앵커로 사슬처럼 합류하고, 이후 본편 내내 서서히 다가오다 마지막 장면에 합류한다
-function composeScenes(scn, ctx) {
+function composeScenes(scn, ctx, pack) {
   if (scn.buildScenes) return scn.buildScenes(ctx);
   const base = scn.scenes.map(s => ({ ...s, fx: [...(s.fx || [])] }));
   if (scn.stars === 'all') return base;
@@ -271,9 +283,9 @@ function composeScenes(scn, ctx) {
   const chain = [];
   let prev = anchor;
   extras.forEach((t, i) => {
-    const beat = prev ? pairBeat(prev, t, ctx) : cameoScene(t, ctx);
+    const beat = prev ? pack.pairBeat(prev, t, ctx) : pack.cameoScene(t, ctx);
     if (beat) {
-      if (typeof beat.sub === 'string') beat.sub = `${joinLine(labelOf(t), i)} ${beat.sub}`;
+      if (typeof beat.sub === 'string') beat.sub = `${pack.joinLine(labelOf(t), i)} ${beat.sub}`;
       chain.push(beat);
     }
     prev = t;
@@ -294,8 +306,10 @@ async function runScenes(scenes, ctx, st) {
 async function startScreening() {
   if (currentShow) return;
   const ctx = buildCtx();
-  const scn = pickScenario(ctx);
-  const scenes = composeScenes(scn, ctx);
+  const pack = pickPack();
+  const scn = pickScenario(ctx, pack);
+  const scenes = composeScenes(scn, ctx, pack);
+  scenes.unshift({ bg: 'day', hold: 2000, fx: [], sub: `오늘의 장르 — ${pack.name}` });
   const st = currentShow = { aborted: false };
   const snap = snapshotPositions();
   document.body.classList.add('cinema');
@@ -305,7 +319,7 @@ async function startScreening() {
     bumpCounter();
     let action;
     do {
-      action = await showEnding(scn, ctx);
+      action = await showEnding(scn, ctx, pack);
       if (action === 'replay') {
         restorePositions(snap);
         await runScenes(scenes, ctx, st);
@@ -328,7 +342,8 @@ function exitCinema() {
   currentShow = null;
 }
 
-function showEnding(scn, ctx) {
+function showEnding(scn, ctx, pack) {
+  $('endKicker').textContent = `당신이 만든 ${pack.name}`;
   $('endTitle').textContent = scn.title.ko;
   $('endEn').textContent = scn.title.en;
   const types = [...new Set(ctx.placed.map(p => p.type))];
