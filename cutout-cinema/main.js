@@ -27,6 +27,7 @@ PIECES.forEach(def => {
   const item = document.createElement('div');
   item.className = 'tray-item';
   item.innerHTML = `<img class="te" src="${def.src}" alt="${def.label}" draggable="false"><div class="tl">${def.label}</div>`;
+  item.title = def.label + ' — 캔버스로 끌어다 놓으세요';
   item.addEventListener('pointerdown', e => {
     if (document.body.classList.contains('cinema')) return;
     e.preventDefault();
@@ -157,7 +158,7 @@ function typeText(text, st) {
       }
       i++;
       subtitle.textContent = text.slice(0, i);
-      setTimeout(tick, 45);
+      setTimeout(tick, 36);
     })();
   });
 }
@@ -310,6 +311,7 @@ async function startScreening() {
   const scn = pickScenario(ctx, pack);
   const scenes = composeScenes(scn, ctx, pack);
   scenes.unshift({ bg: 'day', hold: 2000, fx: [], sub: `오늘의 장르 — ${pack.name}` });
+  $('genreTag').textContent = pack.name;
   const st = currentShow = { aborted: false };
   const snap = snapshotPositions();
   document.body.classList.add('cinema');
@@ -360,7 +362,7 @@ function showEnding(scn, ctx, pack) {
   ending.classList.add('show');
   return new Promise(res => {
     endResolve = res;
-    $('btnSave').onclick = () => savePoster(scn, ctx);
+    $('btnSave').onclick = () => savePoster(scn, ctx, pack);
     $('btnReplay').onclick = () => { ending.classList.remove('show'); endResolve = null; res('replay'); };
     $('btnEdit').onclick = () => { ending.classList.remove('show'); endResolve = null; res('edit'); };
   });
@@ -418,7 +420,7 @@ function loadImg(src) {
   });
 }
 
-async function savePoster(scn, ctx) {
+async function savePoster(scn, ctx, pack) {
   const W = 1200, H = 1600;
   posterCanvas.width = W;
   posterCanvas.height = H;
@@ -455,6 +457,8 @@ async function savePoster(scn, ctx) {
     } catch (e) { console.error('poster img', pc.src, e); }
   }
 
+  if (pack) drawChip(g, pack.name, W * 0.155, H * 0.052, -3, 30);
+
   const words = scn.title.ko.split(' ');
   words.forEach((w, i) => {
     drawChip(g, w, W * 0.5 + (i % 2 ? 60 : -30) * (words.length > 1 ? 1 : 0),
@@ -469,14 +473,20 @@ async function savePoster(scn, ctx) {
   g.fillText('각본·감독 당신  ·  제작 오려낸 영화', W / 2, H * 0.94);
   g.shadowColor = 'transparent';
 
-  posterCanvas.toBlob(blob => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = scn.title.en.toLowerCase().replace(/\s+/g, '-') + '-poster.png';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    showToast('포스터가 저장되었습니다');
-  });
+  try {
+    posterCanvas.toBlob(blob => {
+      if (!blob) return showToast('포스터 저장에 실패했습니다');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = scn.title.en.toLowerCase().replace(/\s+/g, '-') + '-poster.png';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('포스터가 저장되었습니다');
+    });
+  } catch (e) {
+    // file:// 로 열면 캔버스 보안 제한으로 저장이 막힌다 — 배포 사이트에서는 정상
+    showToast('로컬 파일로 열면 저장이 제한됩니다. 배포 사이트에서 시도해주세요');
+  }
 }
 
 let toastTimer = null;
