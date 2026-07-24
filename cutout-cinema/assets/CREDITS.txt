@@ -1,0 +1,13 @@
+이미지 출처 (Wikimedia Commons, 러프 컷아웃 가공)
+
+sheep.png    - File:Sheep, Stodmarsh 6.jpg
+dog.png      - File:Adult male German shepherd dog standing at the beach (retouched).jpg
+phone.png    - File:FeTAp613-1.jpg (Public domain)
+moon.png     - File:Full moon in night sky - India.jpg (CC BY 4.0)
+cloud.png    - File:Stratocumulus and cumulus over Gåseberg.jpg (CC BY-SA 4.0)
+fire.png     - File:Flames of Holika dahan.jpg (CC BY-SA 4.0)
+umbrella.png - File:Red umbrella - Flickr - darko149.jpg
+house.png    - Wikimedia Commons 검색 "red wooden house facade" 결과 (붉은 헛간)
+flower.png   - Wikimedia Commons 검색 "gerbera flower white background" 결과
+
+※ house/flower 원본 파일명·라이선스는 배포 전 재확인 필요.

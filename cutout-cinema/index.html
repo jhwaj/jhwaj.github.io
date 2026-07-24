@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오려낸 영화 — CUTOUT CINEMA</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-mood="day">
+
+  <div id="sky"></div>
+  <div id="grass"></div>
+  <div id="rain"></div>
+
+  <div class="dot" style="left:6%;top:30%"></div>
+  <div class="dot" style="left:88%;top:46%"></div>
+  <div class="dot" style="left:13%;top:9%"></div>
+
+  <div id="hints">
+    <div class="chip hint" style="left:24%;top:24%">조각을 집어서</div>
+    <div class="chip hint" style="left:48%;top:40%">마음에 드는 곳에 놓고</div>
+    <div class="chip hint" style="left:72%;top:18%">START ▶</div>
+  </div>
+
+  <div id="stage"></div>
+  <div id="hand">✋</div>
+
+  <div id="grain"></div>
+  <div id="vignette"></div>
+  <div id="lbTop"></div>
+  <div id="lbBottom"></div>
+
+  <div id="subwrap">
+    <div id="subtitle"></div>
+    <div id="subhint">클릭하면 다음 장면 ▸</div>
+  </div>
+
+  <button id="exitBtn" title="상영 중단">✕</button>
+
+  <div id="ending">
+    <div class="chip" id="endKicker">당신이 만든 영화</div>
+    <div id="endTitle"></div>
+    <div id="endEn"></div>
+    <div id="endCast"></div>
+    <div id="endBtns">
+      <button id="btnSave">포스터 저장</button>
+      <button id="btnReplay">한 번 더 보기</button>
+      <button id="btnEdit">다시 배치하기</button>
+    </div>
+  </div>
+
+  <div id="topbar">
+    <div class="chip logo">오려낸 영화<span>CUTOUT CINEMA</span></div>
+    <div class="chip" id="counter">상영 0회</div>
+  </div>
+
+  <div id="tray"></div>
+  <button id="startBtn">START<span>▶</span></button>
+  <button id="muteBtn" title="소리 켜기/끄기">🔈</button>
+
+  <div id="toast" class="chip"></div>
+  <canvas id="posterCanvas" hidden></canvas>
+
+  <script src="scenarios.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

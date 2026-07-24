@@ -1,0 +1,188 @@
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --yellow:#E8B93D;
+  --sticker:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff);
+}
+
+body{
+  height:100vh;overflow:hidden;user-select:none;-webkit-user-select:none;
+  font-family:'Apple SD Gothic Neo',Pretendard,-apple-system,sans-serif;
+  --sky:#3D7BE8;--grass:#4FA53B;
+}
+body[data-mood="night"]{--sky:#101A3E;--grass:#22402C}
+body[data-mood="dusk"]{--sky:#C9693C;--grass:#457A38}
+body[data-mood="rain"]{--sky:#5B6F95;--grass:#3E6E3B}
+body[data-mood="fire"]{--sky:#7E1D10;--grass:#33251C}
+
+#sky{position:fixed;inset:0;background:var(--sky);transition:background 1.4s ease;z-index:0}
+#grass{position:fixed;left:0;right:0;top:68vh;bottom:0;background:var(--grass);transition:background 1.4s ease;z-index:1}
+
+#rain{
+  position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.2s;
+  background-image:repeating-linear-gradient(78deg,transparent 0 12px,rgba(255,255,255,.3) 12px 13px,transparent 13px 26px);
+  animation:rainfall .45s linear infinite;
+}
+body[data-mood="rain"] #rain{opacity:.45}
+@keyframes rainfall{to{background-position:-52px 110px}}
+
+.dot{position:fixed;width:22px;height:22px;border-radius:50%;background:var(--yellow);z-index:3;pointer-events:none}
+
+/* ── 종이 라벨 칩 ── */
+.chip{
+  display:inline-block;background:#fff;color:#111;font-weight:700;font-size:14px;
+  padding:7px 12px;border-radius:2px;box-shadow:0 3px 10px rgba(0,0,0,.28);
+}
+#hints{position:fixed;inset:0;z-index:3;pointer-events:none;transition:opacity .6s}
+#hints .hint{position:absolute}
+#hints .hint:nth-child(1){transform:rotate(-4deg)}
+#hints .hint:nth-child(2){transform:rotate(2.5deg)}
+#hints .hint:nth-child(3){transform:rotate(-2deg);background:var(--yellow)}
+
+/* ── 조각 ── */
+#stage{position:fixed;inset:0;z-index:5}
+.piece{
+  position:absolute;transform:translate(-50%,-50%);
+  height:auto;cursor:grab;touch-action:none;
+  -webkit-user-drag:none;user-select:none;
+  filter:var(--fx,drop-shadow(0 12px 14px rgba(0,0,0,.35)));
+}
+.piece.dragging{transform:translate(-50%,-50%) scale(1.12) rotate(4deg);cursor:grabbing;z-index:99}
+#hand{
+  position:fixed;z-index:13;display:none;pointer-events:none;
+  font-size:66px;transform:translate(-50%,-50%) rotate(158deg);
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));
+}
+
+/* ── 시네마 모드 ── */
+#grain{
+  position:fixed;inset:0;z-index:8;pointer-events:none;opacity:.07;transition:opacity 1s;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter><rect width="240" height="240" filter="url(%23n)" opacity="0.55"/></svg>');
+}
+body.cinema #grain{opacity:.14}
+#vignette{
+  position:fixed;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity 1.2s;
+  background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.55));
+}
+body.cinema #vignette{opacity:1}
+#lbTop,#lbBottom{position:fixed;left:0;right:0;height:0;background:#000;z-index:10;transition:height .9s ease}
+#lbTop{top:0}#lbBottom{bottom:0}
+body.cinema #lbTop,body.cinema #lbBottom{height:11vh}
+
+#subwrap{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(11vh + 28px);
+  width:min(760px,86vw);text-align:center;z-index:11;display:none;
+}
+body.cinema #subwrap{display:block}
+#subtitle{
+  color:#fff;font-size:20px;font-weight:600;line-height:1.65;min-height:1.7em;
+  text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.8);
+}
+#subtitle.typing::after{content:'▌';opacity:.8}
+#subhint{margin-top:12px;font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em}
+
+#exitBtn{
+  position:fixed;top:16px;right:16px;z-index:16;display:none;
+  width:38px;height:38px;border-radius:50%;background:transparent;color:#fff;
+  border:1px solid rgba(255,255,255,.45);font-size:15px;cursor:pointer;
+}
+body.cinema #exitBtn{display:block}
+#exitBtn:hover{background:rgba(255,255,255,.15)}
+
+/* ── 엔딩 ── */
+#ending{
+  --lime:#ADE92F;
+  position:fixed;inset:0;z-index:14;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+  background:rgba(4,6,10,.92);opacity:0;pointer-events:none;transition:opacity .7s;
+}
+#ending.show{opacity:1;pointer-events:auto}
+#endKicker{background:var(--lime);color:#000;transform:rotate(-2deg);font-size:18px}
+#endTitle{color:#fff;font-weight:900;font-size:clamp(72px,13vw,150px);letter-spacing:.02em}
+#endEn{color:var(--lime);font-size:24px;letter-spacing:normal;font-weight:700}
+#endCast{color:#fff;font-size:18px;margin-top:12px}
+#endBtns{display:flex;gap:12px;margin-top:30px}
+#endBtns button{
+  background:#fff;color:#000;border:none;font-weight:700;font-size:18px;
+  padding:14px 24px;border-radius:2px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.4);
+  font-family:inherit;transition:transform .15s;
+}
+#endBtns button:hover{transform:translateY(-3px) rotate(-1deg)}
+#btnSave{background:var(--lime) !important}
+
+/* ── UI ── */
+#topbar{
+  position:fixed;top:14px;left:14px;right:14px;z-index:12;
+  display:flex;justify-content:space-between;pointer-events:none;
+}
+.logo{transform:rotate(-1.5deg)}
+.logo span{display:block;font-size:9px;letter-spacing:.32em;color:#777;font-weight:700}
+body.cinema #topbar,body.cinema #hints,body.cinema .dot,
+body.cinema #tray,body.cinema #startBtn{display:none}
+
+#tray{
+  position:fixed;left:0;right:0;bottom:0;z-index:12;
+  display:flex;justify-content:center;gap:4px;padding:10px 12px 14px;
+  background:#FDF9EF;box-shadow:0 -6px 20px rgba(0,0,0,.18);
+}
+.tray-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 13px;border-radius:6px;cursor:grab;touch-action:none;
+}
+.tray-item:hover{background:#F2E9D2}
+.tray-item .te{
+  height:56px;width:auto;max-width:96px;object-fit:contain;
+  -webkit-user-drag:none;filter:drop-shadow(0 4px 5px rgba(0,0,0,.22));
+}
+.tray-item .tl{font-size:11px;font-weight:700;color:#444}
+
+#startBtn{
+  position:fixed;right:26px;bottom:118px;z-index:12;
+  width:98px;height:98px;border-radius:50%;border:none;background:var(--yellow);
+  color:#111;font-weight:900;font-size:17px;letter-spacing:.05em;cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,.32);transform:rotate(-8deg);
+  font-family:inherit;transition:transform .15s;
+}
+#startBtn span{display:block;font-size:13px;margin-top:2px}
+#startBtn:hover{transform:rotate(-8deg) scale(1.07)}
+
+#muteBtn{
+  position:fixed;left:16px;bottom:112px;z-index:16;
+  width:40px;height:40px;border-radius:50%;border:none;background:#fff;
+  font-size:16px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+#toast{
+  position:fixed;left:50%;bottom:140px;transform:translateX(-50%) rotate(-1deg);
+  z-index:20;opacity:0;pointer-events:none;transition:opacity .4s;background:var(--yellow);
+}
+#toast.show{opacity:1}
+
+/* ── 장면 연출 (fx) ── */
+@keyframes bob{0%,100%{transform:translate(-50%,-50%) rotate(0)}50%{transform:translate(-50%,calc(-50% - 11px)) rotate(2deg)}}
+body.cinema .piece{animation:bob 3.2s ease-in-out infinite}
+.piece.fx-bob2{animation:bob 1.6s ease-in-out infinite}
+.piece.fx-walk{animation:walkcycle .5s ease-in-out infinite}
+@keyframes walkcycle{0%,100%{transform:translate(-50%,-50%) rotate(-3.5deg)}50%{transform:translate(-50%,calc(-50% - 10px)) rotate(3.5deg)}}
+.piece.fx-glow{--fx:drop-shadow(0 0 28px rgba(255,238,170,.95));animation:bob 4s ease-in-out infinite}
+.piece.fx-stare{animation:stare 1.4s ease-in-out infinite}
+@keyframes stare{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.22) rotate(-3deg)}}
+.piece.fx-approach{animation:approach 3.2s ease forwards}
+@keyframes approach{to{transform:translate(-50%,-30%) scale(1.55)}}
+.piece.fx-drift{animation:drift 5.5s ease-in-out forwards}
+@keyframes drift{to{transform:translate(calc(-50% + 170px),-50%)}}
+.piece.fx-ring{animation:ring .5s ease-in-out infinite}
+@keyframes ring{0%,100%{transform:translate(-50%,-50%) rotate(0)}25%{transform:translate(-50%,-50%) rotate(-10deg)}75%{transform:translate(-50%,-50%) rotate(10deg)}}
+.piece.fx-flicker{animation:flicker .35s steps(2) infinite}
+@keyframes flicker{0%{transform:translate(-50%,-50%) scale(1) rotate(-2deg)}100%{transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}}
+.piece.fx-grow{animation:grow 3.5s ease forwards}
+@keyframes grow{to{transform:translate(-50%,-58%) scale(1.9)}}
+.piece.fx-shake{animation:shake .4s linear infinite}
+@keyframes shake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(calc(-50% - 4px),-50%) rotate(-1.5deg)}75%{transform:translate(calc(-50% + 4px),-50%) rotate(1.5deg)}}
+
+@media (max-width:640px){
+  .piece{max-width:40vw}
+  .tray-item{padding:6px 8px}
+  .tray-item .te{height:38px}
+  #startBtn{width:80px;height:80px;font-size:14px;bottom:104px}
+}
